@@ -3,34 +3,38 @@ from django.db import models
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='customerprof', verbose_name='مشتری')
-    phone = models.CharField(max_length=11, unique=True, blank=False, null=False, verbose_name='شماره تماس', editable=True)
+    phone = models.CharField(max_length=11, unique=True, verbose_name='شماره تماس', editable=True)
+    first_name = models.CharField(max_length=50,blank=True, null=True, verbose_name='نام', editable=True)
+    last_name = models.CharField(max_length=60,blank=True, null=True, verbose_name='نام خوانوادگی', editable=True)
     balance = models.PositiveIntegerField(default=0, verbose_name='موجودی کیف پول' ,editable=True)
 
     class Meta:
         verbose_name = ' پروفایل مشتری'
         verbose_name_plural = 'پروفایل های مشتری'
-        ordering = ['created_at']
+        ordering = ['first_name']
 
     def __str__(self):
         return self.user.username
     
 class SellerProfile(models.Model):
-    user = models.OneToOneField(User, on_delete = models.CASCADE,related_name='sellerprof', verbose_name='فروشنده')
-    phone = models.CharField(max_length=11, unique=True, blank=False, null=False, verbose_name='شماره تماس', editable=True)
+    user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='sellerprof', verbose_name='فروشنده')
+    phone = models.CharField(max_length=11, unique=True, verbose_name='شماره تماس', editable=True)
+    first_name = models.CharField(max_length=50,blank=True, null=True, verbose_name='نام', editable=True)
+    last_name = models.CharField(max_length=60,blank=True, null=True, verbose_name='نام خوانوادگی', editable=True)
    
 
     class Meta:
         verbose_name = 'پروفایل فروشنده'
         verbose_name_plural = 'پروفایل فروشنده ها'
-        ordering = ['created_at']
+        ordering = ['first_name']
 
     def __str__(self):
         return self.user.username
     
 
 class Store(models.Model):
-    name = models.CharField(max_length=50, unique=True, blank=False, null=False, related_name='store', verbose_name='فروشگاه')
-    seller = models.ForeignKey(SellerProfile, on_delete = models.CASCADE, verbose_name='فروشنده')
+    name = models.CharField(max_length=50, unique=True, blank=False, null=False, verbose_name='فروشگاه')
+    seller = models.ForeignKey(SellerProfile, on_delete = models.CASCADE, related_name='store', verbose_name='فروشنده')
     description = models.TextField(max_length=300, blank=True, null=True, verbose_name='اطلاعات تماس', editable=True)
     location = models.CharField(max_length=50, blank=True, null=True, verbose_name='مکان', editable=True)
     rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, editable=True, verbose_name='امتیاز')
@@ -45,11 +49,11 @@ class Store(models.Model):
         return self.name
     
 class Product(models.Model):
-    name = models.CharField(max_length=50, unique=True, blank=False, null=False, related_name='product', verbose_name='نام کالا')
+    name = models.CharField(max_length=50, unique=True, blank=False, null=False, verbose_name='نام کالا')
     price = models.PositiveIntegerField(blank=False, null=False, verbose_name='قیمت', editable=True)
     description = models.TextField(max_length=300, blank=True, null=True, verbose_name='اطلاعات محصول')
     image = models.ImageField(upload_to='productpic/', blank=False, null=False, verbose_name='تصویر محصول', editable=True)
-    store = models.ForeignKey(Store, on_delete = models.CASCADE, verbose_name='فروشگاه')
+    store = models.ForeignKey(Store, on_delete = models.CASCADE,related_name='product', verbose_name='فروشگاه')
     created_at = models.DateTimeField(auto_now_add=True)
     rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, editable=True, verbose_name='امتیاز')
     
@@ -63,8 +67,8 @@ class Product(models.Model):
         return self.name
     
 class CartItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='cartitem', verbose_name='نام محصول')
-    customer = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE, verbose_name='مشتری')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='نام محصول')
+    customer = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE, related_name='cartitem', verbose_name='مشتری')
     quantity = models.PositiveIntegerField(default=1 ,verbose_name='تعداد محصول')
     
     class Meta:
@@ -99,7 +103,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='orderitem', verbose_name='سفارش')
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, verbose_name='نام محصول')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, verbose_name='نام محصول')
     quantity = models.PositiveIntegerField(default=1 ,verbose_name='تعداد محصول')
     price = models.PositiveIntegerField(verbose_name='قیمت')
 
