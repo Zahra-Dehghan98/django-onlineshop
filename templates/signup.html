@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Sign Up | DijiKala{% endblock %}
+
+{% block content %}
+<h2>🧾 Create Account</h2>
+<form method="post" class="auth-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    </div>
+    <div class="form-group">
+        <label for="id_phone">phone</label>
+        {{ form.phone }}
+    </div>
+        <div class="form-group">
+        <label for="id_first_name">first name</label>
+        {{ form.first_name }}
+    </div>
+        <div class="form-group">
+        <label for="id_last_name">last name</label>
+        {{ form.last_name }}
+    </div>
+    <div class="form-group">
+        <label for="id_password1">Password</label>
+        {{ form.password1 }}
+    </div>
+    <div class="form-group">
+        <label for="id_password2">Confirm Password</label>
+        {{ form.password2 }}
+    <div class="form-group">
+        <label for="id_is_seller">Is Seller?</label>{{ form.is_seller }}
+    </div>
+    <button type="submit" class="btn">Sign Up</button>
+
+    <p class="auth-link">Already have an account? 
+        <a href="{% url 'login' %}">Login</a>
+    </p>
+</form>
+{% endblock %}
