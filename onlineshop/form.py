@@ -10,5 +10,5 @@ class UserRegisterForm(UserCreationForm):
         fields = ['phone', 'first_name', 'last_name', 'password1', 'password2', 'is_seller']
 
 class UserLoginForm(AuthenticationForm):
-    username = models.CharField(max_length=11)
-    password = models.CharField()
+    username = forms.CharField(max_length=11)
+    password = forms.CharField(max_length=50)
