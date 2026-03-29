@@ -5,7 +5,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import CreateView
 from django.contrib.auth.views import LoginView, LogoutView
-
+from django.views.generic import ListView
+from .models import *
 class UserRegisterView(CreateView):
     form_class = UserRegisterForm
     template_name = 'signup.html'
@@ -58,3 +59,9 @@ class UserLogoutView(LogoutView):
     def dispatch(self, request, *args, **kwargs):
         messages.info(request, 'the user id logged out successfully')
         return super().dispatch(request, *args, **kwargs)
+    
+#===================================================================
+class ShowAllProducts(ListView):
+    model = Product
+    template_name = 'home.html'
+    context_object_name = 'product'

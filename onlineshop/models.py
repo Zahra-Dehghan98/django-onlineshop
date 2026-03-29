@@ -95,7 +95,7 @@ class Product(models.Model):
     price = models.PositiveIntegerField(blank=False, null=False, verbose_name='price', editable=True)
     description = models.TextField(max_length=300, blank=True, null=True, verbose_name='description of the product')
     image = models.ImageField(upload_to='productpic/', blank=False, null=False, verbose_name='image of the product', editable=True)
-    store = models.ForeignKey(Store, on_delete = models.CASCADE,related_name='product', verbose_name='store')
+    store = models.ForeignKey(Store, on_delete = models.CASCADE, related_name='product', verbose_name='store')
     created_at = models.DateTimeField(auto_now_add=True)
     rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, editable=True, verbose_name='rate')
     
@@ -103,7 +103,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
-        ordering = ['created_at']
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
