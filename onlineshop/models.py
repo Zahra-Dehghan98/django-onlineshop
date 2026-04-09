@@ -63,7 +63,7 @@ class CustomerProfile(models.Model):
         return self.user.first_name
     
 class SellerProfile(models.Model):
-    user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='sellerprof', verbose_name='فروشنده')
+    user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='sellerprof', verbose_name='seller')
    
     class Meta:
         verbose_name = 'Seller Profile'

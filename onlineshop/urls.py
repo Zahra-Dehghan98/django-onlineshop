@@ -6,4 +6,8 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name ='login'),
     path('signup/', UserLogoutView.as_view(), name ='logout'),
     path('/', ShowAllProducts.as_view(), name='/'),
+    path('stores/', ShowAllStores.as_view(), name='stores'),
+    path('stores/<int:pk>/', ShowDetailStore.as_view(), name='store_detail'),
+    path('seller/', SellerPanelView.as_view(), name='seller_panel'),
+    path('seller/createstore/', AddStoreView.as_view(), name='create_store'),
 ] 

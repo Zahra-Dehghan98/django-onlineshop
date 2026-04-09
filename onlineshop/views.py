@@ -5,8 +5,10 @@ from django.contrib.auth import login, logout, authenticate
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import CreateView
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from .models import *
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 class UserRegisterView(CreateView):
     form_class = UserRegisterForm
     template_name = 'signup.html'
@@ -64,4 +66,40 @@ class UserLogoutView(LogoutView):
 class ShowAllProducts(ListView):
     model = Product
     template_name = 'home.html'
-    context_object_name = 'product'
+    context_object_name = 'products'
+#===================================================================
+class ShowAllStores(ListView):
+    model = Store
+    template_name = 'stores.html'
+    context_object_name = 'stores'
+#===================================================================
+class ShowDetailStore(DetailView):
+    model = Store
+    template_name = 'store_detail.html'
+    context_object_name = 'store'
+#===================================================
+class SellerPanelView(LoginRequiredMixin, ListView):
+    model = Store
+    template_name = 'seller_panel.html'
+    context_object_name = 'store'
+
+    def get_queryset(self):
+        user = self.request.user
+        try:
+            seller_profile_instance = user.sellerprof
+            return Store.objects.filter(seller=seller_profile_instance)
+        except SellerProfile.DoesNotExist:
+            return Store.objects.none()       
+#===================================================
+class AddStoreView(CreateView):
+    model = Store
+    form_class = AddStoreForm
+    template_name = 'create_store.html'
+    context_object_name = 'store'
+    success_url = reverse_lazy ('stores')
+
+    def form_valid(self, form):
+        seller_profile = SellerProfile.objects.get(user=self.request.user)
+        form.instance.seller = seller_profile
+        return super().form_valid(form)
+        
