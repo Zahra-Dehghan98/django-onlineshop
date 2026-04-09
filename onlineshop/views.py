@@ -12,7 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class UserRegisterView(CreateView):
     form_class = UserRegisterForm
     template_name = 'signup.html'
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy('/')
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -47,7 +47,7 @@ class UserLoginView(LoginView):
     def get_success_url(self):
         user = self.request.user
         if user.is_seller:
-            return reverse_lazy('signup') 
+            return reverse_lazy('seller_panel') 
         else:
             return reverse_lazy('signup') 
 
@@ -55,12 +55,9 @@ class UserLoginView(LoginView):
         messages.error(self.request, 'the username or password in not correct')
         return super().form_invalid(form)
 
-class UserLogoutView(LogoutView):
-    template_name = 'logged_out.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        messages.info(request, 'the user id logged out successfully')
-        return super().dispatch(request, *args, **kwargs)
+def user_logout_view(request):
+    logout(request)
+    return render(request, 'logged_out.html')
     
 #===================================================================
 class ShowAllProducts(ListView):
