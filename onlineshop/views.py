@@ -8,6 +8,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import ListView, DetailView
 from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
 
 class UserRegisterView(CreateView):
     form_class = UserRegisterForm
@@ -99,4 +101,20 @@ class AddStoreView(CreateView):
         seller_profile = SellerProfile.objects.get(user=self.request.user)
         form.instance.seller = seller_profile
         return super().form_valid(form)
+#===================================================
+class AddProductView(CreateView):
+    model = Product
+    form_class = AddProductForm
+    template_name = 'create_product.html'
+    success_url = reverse_lazy ('/')
+
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
         
+        store_id = self.kwargs.get('pk') 
+        store = get_object_or_404(Store, pk=store_id)
+        
+        obj.store = store
+        obj.save()
+        return super().form_valid(form)

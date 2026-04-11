@@ -5,9 +5,9 @@
 {% block content %}
 <div class="store-header">
     <h2>{{ store.name }}</h2>
-    <p>{{ store.description }}</p>
+    <p>{{ store.description }}</p><br>
 
-    {% if user == store.owner.user %}
+    {% if user == store.seller.user %}
         <a href="{% url 'add_product' store.id %}" class="btn">+ Add Product</a>
     {% endif %}
 </div>
@@ -15,7 +15,7 @@
 <hr>
 
 <div class="card-grid">
-    {% for product in products %}
+    {% for product in store.product.all %}
         <div class="card">
             {% if product.image %}
                 <img src="{{ product.image.url }}" alt="{{ product.name }}">
@@ -27,7 +27,7 @@
             <p><strong>${{ product.price }}</strong></p>
 
             {% if user.is_authenticated %}
-                <a href="{% url 'add_to_cart' product.id %}" class="btn">Add to Cart</a>
+                <a href="#" class="btn">Add to Cart</a>
             {% else %}
                 <p><a href="{% url 'login' %}">Login to Buy</a></p>
             {% endif %}
