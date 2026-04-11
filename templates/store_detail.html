@@ -27,7 +27,9 @@
             <p><strong>${{ product.price }}</strong></p>
 
             {% if user.is_authenticated %}
+                {% if user.is_seller == False %}
                 <a href="#" class="btn">Add to Cart</a>
+                {% endif %}
             {% else %}
                 <p><a href="{% url 'login' %}">Login to Buy</a></p>
             {% endif %}

@@ -2,10 +2,9 @@
 {% load static %}
 {% block title %}Home | DijiKala{% endblock %}
 
-
-<a href="{% url 'stores' %}">all stores</a>
 {% block content %}
 <h2>🛒 Latest Products</h2>
+<a href="{% url 'stores' %}">all stores</a>
 <div class="card-grid">
     {% for product in products %}
         <div class="card">

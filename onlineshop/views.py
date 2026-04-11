@@ -118,3 +118,13 @@ class AddProductView(CreateView):
         obj.store = store
         obj.save()
         return super().form_valid(form)
+#===================================================
+class CustomerPanelView(LoginRequiredMixin, DetailView):
+    model = CustomerProfile
+    template_name = 'customer_panel.html'
+    context_object_name = 'customer_profile'
+
+    def get_object(self):
+        user = self.request.user
+        customer = CustomerProfile.objects.get(user=user)
+        return customer  
