@@ -94,6 +94,7 @@ class Product(models.Model):
     name = models.CharField(max_length=50, unique=True, blank=False, null=False, verbose_name='product')
     price = models.PositiveIntegerField(blank=False, null=False, verbose_name='price', editable=True)
     description = models.TextField(max_length=300, blank=True, null=True, verbose_name='description of the product')
+    stock = models.IntegerField(default=1, verbose_name='stock')
     image = models.ImageField(upload_to='productpic/', blank=False, null=False, verbose_name='image of the product', editable=True)
     store = models.ForeignKey(Store, on_delete = models.CASCADE, related_name='product', verbose_name='store')
     created_at = models.DateTimeField(auto_now_add=True)
