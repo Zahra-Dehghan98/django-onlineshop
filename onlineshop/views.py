@@ -51,7 +51,7 @@ class UserLoginView(LoginView):
         if user.is_seller:
             return reverse_lazy('seller_panel') 
         else:
-            return reverse_lazy('signup') 
+            return reverse_lazy('customer_panel') 
 
     def form_invalid(self, form):
         messages.error(self.request, 'the username or password in not correct')
@@ -133,6 +133,14 @@ class AddedItemsListView(ListView):
     model = CartItem
     template_name = 'cart.html'
     context_object_name = 'cart_items'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        total = 0
+        for item in context['cart_items']:
+            total += item.product.price * item.quantity
+        context['total'] = total
+        return context
 #===================================================
 class AddToCartView(View):
     def post(self, request, store_id, product_id):
@@ -185,5 +193,19 @@ class RemoveFromCartView(View):
         item2 = CartItem.objects.all()
         return render (request, 'cart.html', {'cart_items':item2})
 #======================================================
+class AddBalanceView(View):
+    model = CustomerProfile
+
+    def get(self, request):
+        return render (request, 'payment.html')
+
+    def post(self, request):
+        user = self.request.user
+        amount = int(request.POST.get('amount', 0))
+        customer_profile = CustomerProfile.objects.get(user=user)
+        customer_profile.balance += amount
+        customer_profile.save()
+        return render (request, 'thank_you.html')
+#=======================================================
 
         
