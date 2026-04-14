@@ -9,7 +9,7 @@ from django.views.generic import ListView, DetailView
 from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
+from django.views import View
 
 class UserRegisterView(CreateView):
     form_class = UserRegisterForm
@@ -128,3 +128,46 @@ class CustomerPanelView(LoginRequiredMixin, DetailView):
         user = self.request.user
         customer = CustomerProfile.objects.get(user=user)
         return customer  
+#===================================================
+class AddedItemsListView(ListView):
+    model = CartItem
+    template_name = 'cart.html'
+    context_object_name = 'cart_items'
+#===================================================
+class AddToCartView(View):
+    def post(self, request, store_id, product_id):
+        product = get_object_or_404(Product, pk=product_id)
+        store = get_object_or_404(Store, pk=store_id)
+        try:
+            customer = request.user.customerprof
+        except AttributeError:
+            messages.error(request, "پروفایل مشتری یافت نشد.")
+            return redirect('store_detail', pk=store_id)
+        try:
+            quantity = int(request.POST.get('quantity', 1))
+            if quantity <= 0:
+                raise ValueError("تعداد باید مثبت باشد")
+            if product.stock < quantity:
+                messages.error(request, "موجودی محصول کافی نیست.")
+                return redirect('store_detail', pk=store_id)     
+        except (ValueError, TypeError):
+            messages.error(request, "تعداد نامعتبر است.")
+            return redirect('store_detail', pk=store_id)
+        
+        cart_item, created = CartItem.objects.get_or_create(
+            product=product,
+            customer=customer,
+            defaults={'quantity': quantity} 
+        )
+        
+        if not created:
+            cart_item.quantity += quantity
+            cart_item.save()
+        else:
+            cart_item.save()
+
+        product.stock -= quantity
+        product.save()
+        
+        messages.success(request, "محصول با موفقیت به سبد خرید اضافه شد.")
+        return redirect('store_detail', pk=store_id)

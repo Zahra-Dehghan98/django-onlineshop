@@ -150,18 +150,8 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(default=1 ,verbose_name='quntity')
     price = models.PositiveIntegerField(verbose_name='price')
 
-
     class Meta:
         verbose_name = 'OrderItem'
         verbose_name_plural = 'OrderItems'
         unique_together = ('order', 'product')
         ordering = ['order']
-
-    
-
-
-
-
-
-
-

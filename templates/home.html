@@ -17,7 +17,16 @@
             <p>{{ product.description|truncatewords:12 }}</p>
             <p><strong>${{ product.price }}</strong></p>
             {% if user.is_authenticated %}
-                <a href="#" class="btn">Add to Cart</a>
+                {% if user.is_seller == False %}
+                    <form method="POST" action="{% url 'add_to_cart' store_id=product.store.id product_id=product.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-success mt-2">َAdd To Cart</button>
+                    </form>
+                {% endif %}
             {% else %}
                 <p><a href="{% url 'login' %}">Login to Buy</a></p>
             {% endif %}
