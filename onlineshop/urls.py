@@ -14,4 +14,5 @@ urlpatterns = [
     path('customer/', CustomerPanelView.as_view(), name='customer_panel'),
     path('cart/', AddedItemsListView.as_view(), name='cart'),
     path('stores/<int:store_id>/addtocart/<int:product_id>/', AddToCartView.as_view(), name='add_to_cart'),
+    path('cart/<int:item_id>/removefromcart/', RemoveFromCartView.as_view(), name='remove_from_cart'),
 ] 

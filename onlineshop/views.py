@@ -171,3 +171,19 @@ class AddToCartView(View):
         
         messages.success(request, "محصول با موفقیت به سبد خرید اضافه شد.")
         return redirect('store_detail', pk=store_id)
+#======================================================
+class RemoveFromCartView(View):
+    model = CartItem
+    template_name = 'cart.html'
+    
+    def get(self, request, item_id):
+        item = CartItem.objects.get(id = item_id)
+        product = item.product
+        product.stock += item.quantity
+        product.save()
+        item.delete()
+        item2 = CartItem.objects.all()
+        return render (request, 'cart.html', {'cart_items':item2})
+#======================================================
+
+        

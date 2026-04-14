@@ -22,7 +22,7 @@
                     <td>{{ item.product.store.name }}</td>
                     <td>${{ item.product.price }}</td>
                     <td>{{ item.quantity }}</td>
-                    <td><a href="#">❌</a></td>
+                    <td><a href="{% url 'remove_from_cart' item.id %}">❌</a></td>
                 </tr>
             {% endfor %}
         </tbody>
