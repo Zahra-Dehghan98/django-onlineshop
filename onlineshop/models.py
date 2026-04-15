@@ -64,7 +64,8 @@ class CustomerProfile(models.Model):
     
 class SellerProfile(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='sellerprof', verbose_name='seller')
-   
+    balance = models.PositiveIntegerField(default=0, verbose_name='balance' ,editable=True)
+
     class Meta:
         verbose_name = 'Seller Profile'
         verbose_name_plural = 'Seller Profiles'
