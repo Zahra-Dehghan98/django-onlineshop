@@ -10,6 +10,7 @@ from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.views import View
+from django.db import transaction
 
 class UserRegisterView(CreateView):
     form_class = UserRegisterForm
@@ -80,7 +81,7 @@ class ShowDetailStore(DetailView):
 class SellerPanelView(LoginRequiredMixin, ListView):
     model = Store
     template_name = 'seller_panel.html'
-    context_object_name = 'store'
+    context_object_name = 'stores'
 
     def get_queryset(self):
         user = self.request.user
@@ -134,6 +135,16 @@ class AddedItemsListView(ListView):
     template_name = 'cart.html'
     context_object_name = 'cart_items'
 
+    def get_queryset(self):
+        user = self.request.user 
+        if not user.is_authenticated:
+            return CartItem.objects.none()
+        try:
+            customer = CustomerProfile.objects.get(user=user)
+            return CartItem.objects.filter(customer=customer)
+        except CustomerProfile.DoesNotExist:
+            return CartItem.objects.none()
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         total = 0
@@ -194,8 +205,6 @@ class RemoveFromCartView(View):
         return render (request, 'cart.html', {'cart_items':item2})
 #======================================================
 class AddBalanceView(View):
-    model = CustomerProfile
-
     def get(self, request):
         return render (request, 'payment.html')
 
@@ -205,7 +214,69 @@ class AddBalanceView(View):
         customer_profile = CustomerProfile.objects.get(user=user)
         customer_profile.balance += amount
         customer_profile.save()
-        return render (request, 'thank_you.html')
+        return redirect('thank_you')
 #=======================================================
+class CheckoutView(View):
+    @transaction.atomic
+    def post(self, request):
+        user = request.user
+        customer = CustomerProfile.objects.get(user = user)
+        cart_items = CartItem.objects.filter(customer=customer)
+        if not cart_items.exists(): 
+            messages.error(request, "your cart is empty!")
+            return redirect('cart')
+        total = 0
+        for item in cart_items:
+            total += item.product.price * item.quantity
+        customer.balance -= total
+        customer.save()
+        for item in cart_items:
+            seller = item.product.store.seller
+            amount = item.product.price * item.quantity
+            seller.balance += amount
+            seller.save()
+        order = Order.objects.create(customer=customer, total_amount = total)
+        for item in cart_items:
+            order_item = OrderItem.objects.create(order= order, product = item.product, quantity = item.quantity, price = item.product.price)
+        cart_items.delete()
+        return redirect ('thank_you')
+#=================================================  
+class OrderHistoryView(ListView):
+    model = Order
+    context_object_name = 'orders'
+    template_name = 'order_history.html'
+
+    def get_queryset(self):
+        user = self.request.user
+        try:
+            customer = CustomerProfile.objects.get(user=user)
+            return Order.objects.filter(customer=customer)
+            return redirect('order_history')
+        
+        except CustomerProfile.DoesNotExist:
+            return Order.objects.none()
+#====================================================
+def ThankYouView(request):
+    return render(request, 'thank_you.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+
+
+
+    
 
         

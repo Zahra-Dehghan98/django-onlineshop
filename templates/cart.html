@@ -30,7 +30,10 @@
 
 
     <p><strong>Total:</strong> ${{ total }}</p>
-    <a href="#" class="btn">✅ Checkout</a>
+    <form action="{% url 'checkout' %}" method="POST">
+        {% csrf_token %} 
+        <button type="submit">✅ Checkout</button>
+    </form>
 
 {% else %}
     <p>Your cart is empty.</p>
