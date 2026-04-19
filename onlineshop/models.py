@@ -80,7 +80,7 @@ class Store(models.Model):
     seller = models.ForeignKey(SellerProfile, on_delete = models.CASCADE, related_name='store', verbose_name='seller')
     description = models.TextField(max_length=300, blank=True, null=True, verbose_name='description', editable=True)
     location = models.CharField(max_length=50, blank=True, null=True, verbose_name='location', editable=True)
-    rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, editable=True, verbose_name='rate')
+    rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, verbose_name='rate')
     
 
     class Meta:
@@ -99,7 +99,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='productpic/', blank=False, null=False, verbose_name='image of the product', editable=True)
     store = models.ForeignKey(Store, on_delete = models.CASCADE, related_name='product', verbose_name='store')
     created_at = models.DateTimeField(auto_now_add=True)
-    rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, editable=True, verbose_name='rate')
+    rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, verbose_name='rate')
     
 
     class Meta:
@@ -149,7 +149,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='orderitem', verbose_name='order')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, verbose_name='product')
     quantity = models.PositiveIntegerField(default=1 ,verbose_name='quntity')
-    price = models.PositiveIntegerField(verbose_name='price')
+    price = models.PositiveIntegerField(verbose_name='price', editable= False)
 
     class Meta:
         verbose_name = 'OrderItem'
