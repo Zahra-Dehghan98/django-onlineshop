@@ -2,42 +2,47 @@
 {% block title %}Order History | DijiKala{% endblock %}
 
 {% block content %}
-<h2>🛒 Orders</h2>
+{% if user.is_seller == False %}
+    <h2>🛒 Orders</h2>
 
-{% if orders %}
-    <table class="cart-table">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Products</th>
-                <th>Date</th>
-                <th>Order Status</th>
-                <th>Total Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-                {% if order.total_amount > 0 or order.orderitem.all %}
+    {% if orders %}
+        <table class="cart-table">
+            <thead>
                 <tr>
-                    <td>{{ order.id }}</td>
-                    <td>
-                        {% if order.orderitem.all %}
-                            {% for item in order.orderitem.all %}
-                                {{ item.product.name }}<br>
-                            {% endfor %}
-                        {% else %}
-                            <span style="color: gray;">(بدون محصول)</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ order.date|date:"Y.m.d" }}</td>
-                    <td>{{ order.order_status }}</td>
-                    <td>${{ order.total_amount }}</td>
+                    <th>Order ID</th>
+                    <th>Products</th>
+                    <th>Date</th>
+                    <th>Order Status</th>
+                    <th>Total Amount</th>
                 </tr>
-                {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    {% if order.total_amount > 0 or order.orderitem.all %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>
+                            {% if order.orderitem.all %}
+                                {% for item in order.orderitem.all %}
+                                    {{ item.product.name }}<br>
+                                {% endfor %}
+                            {% else %}
+                                <span style="color: gray;">(بدون محصول)</span>
+                            {% endif %}
+                            </td>
+                            <td>{{ order.date|date:"Y.m.d" }}</td>
+                            <td>{{ order.status }}</td>
+                            <td>${{ order.total_amount }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>order history is empty.</p>
+    {% endif %}
 {% else %}
-    <p>order history is empty.</p>
+    <h3> ❌ Access Denied</h3><br>
+    <p>شما کاربر فروشنده هستید اجازه دسترسی ندارید</p>
 {% endif %}
 {% endblock %}

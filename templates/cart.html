@@ -2,40 +2,46 @@
 {% block title %}Cart | DijiKala{% endblock %}
 
 {% block content %}
-<h2>🛒 Your Cart</h2>
+{% if user.is_authenticated %}
+    {% if user.is_seller == False %}
+        <h2>🛒 Your Cart</h2>
 
-{% if cart_items %}
-    <table class="cart-table">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Store</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Remove</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in cart_items %}
-                <tr>
-                    <td>{{ item.product.name }}</td>
-                    <td>{{ item.product.store.name }}</td>
-                    <td>${{ item.product.price }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td><a href="{% url 'remove_from_cart' item.id %}">❌</a></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% if cart_items %}
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Store</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.product.store.name }}</td>
+                            <td>${{ item.product.price }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td><a href="{% url 'remove_from_cart' item.id %}">❌</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
+            <p><strong>Total:</strong> ${{ total }}</p>
+            <form action="{% url 'checkout' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit">✅ Checkout</button>
+            </form>
 
-    <p><strong>Total:</strong> ${{ total }}</p>
-    <form action="{% url 'checkout' %}" method="POST">
-        {% csrf_token %} 
-        <button type="submit">✅ Checkout</button>
-    </form>
-
-{% else %}
-    <p>Your cart is empty.</p>
+        {% else %}
+            <p>Your cart is empty.</p>
+        {% endif %}
+    {% else %}
+        <h3> ❌ Access Denied</h3><br>
+        <p>شما کاربر فروشنده هستید و اجازه دسترسی را ندارید</p>
+    {% endif %}
 {% endif %}
 {% endblock %}

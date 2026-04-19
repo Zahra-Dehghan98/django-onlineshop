@@ -2,27 +2,33 @@
 {% block title %}Create Store | DijiKala{% endblock %}
 
 {% block content %}
-<h2>🧾 Create Store</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+{% if user.is_authenticated %}
+    {% if user.is_seller == True %}
+        <h2>🧾 Create Store</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
 
-    <div class="form-group">
-        <label for="id_name">Name</label>
-        {{ form.name }}
-    </div><br>
+            <div class="form-group">
+                <label for="id_name">Name</label>
+                {{ form.name }}
+            </div><br>
 
-    <div class="form-group">
-        <label for="description">Description</label>
-        {{ form.description }}
-    </div><br>
+            <div class="form-group">
+                <label for="description">Description</label>
+                {{ form.description }}
+            </div><br>
 
-    <div class="form-group">
-        <label for="id_location">Location</label>
-        {{ form.location }}
-    </div><br>
+            <div class="form-group">
+                <label for="id_location">Location</label>
+                {{ form.location }}
+            </div><br>
 
-    <button type="submit" class="btn">Create Store</button>
-</form>
-
+            <button type="submit" class="btn">Create Store</button>
+        </form>
+    {% else %}
+        <h3> ❌ Access Denied</h3><br>
+        <p>شما کاربر مشتری هستید برای ایجاد فروشگاه خود باید به عنوان فروشنده ثبت نام کنید یا وارد شوید</p>
+    {% endif %}
+{% endif %}
 {% endblock %}

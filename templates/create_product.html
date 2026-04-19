@@ -2,37 +2,43 @@
 {% block title %}Create Product | DijiKala{% endblock %}
 
 {% block content %}
-<h2>🧾 Create Product</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+{% if user.is_authenticated %}
+    {% if user.is_seller == True %}
+        <h2>🧾 Create Product</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
 
-    <div class="form-group">
-        <label for="id_name">Name</label>
-        {{ form.name }}
-    </div><br>
+            <div class="form-group">
+                <label for="id_name">Name</label>
+                {{ form.name }}
+            </div><br>
 
-    <div class="form-group">
-        <label for="description">Description</label>
-        {{ form.description }}
-    </div><br>
+            <div class="form-group">
+                <label for="description">Description</label>
+                {{ form.description }}
+            </div><br>
 
-    <div class="form-group">
-        <label for="id_price">price</label>
-        {{ form.price }}
-    </div><br>
+            <div class="form-group">
+                <label for="id_price">price</label>
+                {{ form.price }}
+            </div><br>
 
-    <div class="form-group">
-        <label for="id_image">image</label>
-        {{ form.image }}
-    </div><br>
+            <div class="form-group">
+                <label for="id_image">image</label>
+                {{ form.image }}
+            </div><br>
 
-    <div class="form-group">
-        <label for="id_stock">stock</label>
-        {{ form.stock }}
-    </div><br>
+            <div class="form-group">
+                <label for="id_stock">stock</label>
+                {{ form.stock }}
+            </div><br>
 
-    <button type="submit" class="btn">Create Product</button>
-</form>
-
+            <button type="submit" class="btn">Create Product</button>
+        </form>
+    {% else %}
+        <h3> ❌ Access Denied</h3><br>
+        <p>شما کاربر مشتری هستید برای اضافه کردن محصول به فروشگاه خود باید به عنوان فروشنده ثبت نام کنید یا وارد شوید</p>
+    {% endif %}
+{% endif %}
 {% endblock %}

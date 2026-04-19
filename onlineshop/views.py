@@ -127,8 +127,11 @@ class CustomerPanelView(LoginRequiredMixin, DetailView):
 
     def get_object(self):
         user = self.request.user
-        customer = CustomerProfile.objects.get(user=user)
-        return customer  
+        if user.is_seller == True:
+            messages.error(self.request, "")
+        else:
+            customer = CustomerProfile.objects.get(user=user)
+            return customer  
 #===================================================
 class AddedItemsListView(ListView):
     model = CartItem
@@ -189,7 +192,7 @@ class AddToCartView(View):
         product.save()
         
         messages.success(request, "محصول با موفقیت به سبد خرید اضافه شد.")
-        return redirect('store_detail', pk=store_id)
+        return redirect('cart')
 #======================================================
 class RemoveFromCartView(View):
     model = CartItem
@@ -251,8 +254,6 @@ class OrderHistoryView(ListView):
         try:
             customer = CustomerProfile.objects.get(user=user)
             return Order.objects.filter(customer=customer)
-            return redirect('order_history')
-        
         except CustomerProfile.DoesNotExist:
             return Order.objects.none()
 #====================================================

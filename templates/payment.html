@@ -2,9 +2,9 @@
 {% block title %}Payment | DijiKala{% endblock %}
 
 {% block content %}
-<h2>💳 Add Balance</h2>
 {% if user.is_authenticated %}
     {% if user.is_seller == False %}
+        <h2>💳 Add Balance</h2>
         <form action="{% url 'payment' %}" method="post" class="payment-form">
             {% csrf_token %}
             <label for="amount">Enter amount:</label>
@@ -12,7 +12,8 @@
             <button type="submit" class="btn">Add Balance</button>   
         </form>
     {% else %}
-        <p>شما کاربر فروشنده هستید برای افزایش موجودی باید به عنوان مشتری ثبت نام کنید یا وارد شوید</p>
+        <h3> ❌ Access Denied</h3><br>
+        <p>شما کاربر فروشنده هستید اجازه دسترسی ندارید</p>
     {% endif %}
 {% else %}
     <p><a href="{% url 'login' %}">Login to Add Balance</a></p>
