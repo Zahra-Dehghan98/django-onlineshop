@@ -23,15 +23,15 @@ class UserRegisterView(CreateView):
         is_seller = form.cleaned_data.get('is_seller',False)
         if is_seller:
             SellerProfile.objects.create(user = user)
-            messages.success(self.request, f'user:{user.last_name} created as a seller')
+            messages.success(self.request, f'Seller account created for {user.last_name}')
         else:
             CustomerProfile.objects.create(user=user)
-            messages.success(self.request, f'user:{user.last_name} created as a customer')
+            messages.success(self.request, f'Customer account created for {user.last_name}')
         login(self.request, user) 
         return response  
     
     def form_invalid(self, form):
-        messages.error(self.request, 'the register is not successfully')
+        messages.error(self.request, 'Registration failed. Please try again')
         return super().form_invalid(form)
     
 class UserLoginView(LoginView):
@@ -55,13 +55,12 @@ class UserLoginView(LoginView):
             return reverse_lazy('customer_panel') 
 
     def form_invalid(self, form):
-        messages.error(self.request, 'the username or password in not correct')
+        messages.error(self.request, 'Incorrect phone number or password')
         return super().form_invalid(form)
 
 def user_logout_view(request):
     logout(request)
     return render(request, 'logged_out.html')
-    
 #===================================================================
 class ShowAllProducts(ListView):
     model = Product
@@ -163,17 +162,17 @@ class AddToCartView(View):
         try:
             customer = request.user.customerprof
         except AttributeError:
-            messages.error(request, "پروفایل مشتری یافت نشد.")
+            messages.error(request, "Customer profile not found")
             return redirect('store_detail', pk=store_id)
         try:
             quantity = int(request.POST.get('quantity', 1))
             if quantity <= 0:
-                raise ValueError("تعداد باید مثبت باشد")
+                raise ValueError("Product quantity must be a positive number")
             if product.stock < quantity:
-                messages.error(request, "موجودی محصول کافی نیست.")
+                messages.error(request, "Not enough product in stock")
                 return redirect('store_detail', pk=store_id)     
         except (ValueError, TypeError):
-            messages.error(request, "تعداد نامعتبر است.")
+            messages.error(request, "Quantity value is invalid")
             return redirect('store_detail', pk=store_id)
         
         cart_item, created = CartItem.objects.get_or_create(
@@ -191,7 +190,7 @@ class AddToCartView(View):
         product.stock -= quantity
         product.save()
         
-        messages.success(request, "محصول با موفقیت به سبد خرید اضافه شد.")
+        messages.success(request, "Product added to cart successfully")
         return redirect('cart')
 #======================================================
 class RemoveFromCartView(View):

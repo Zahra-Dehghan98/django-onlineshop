@@ -140,7 +140,7 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'Order'
         verbose_name_plural = 'Orders'
-        ordering = ['date']
+        ordering = ['-date']
 
     def __str__(self):
         return f'order: {self.customer} in date:{self.date} - total amount: {self.total_amount} in status:{self.status}'
