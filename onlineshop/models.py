@@ -78,7 +78,7 @@ class SellerProfile(models.Model):
 class Store(models.Model):
     name = models.CharField(max_length=50, unique=True, blank=False, null=False, verbose_name='store')
     seller = models.ForeignKey(SellerProfile, on_delete = models.CASCADE, related_name='store', verbose_name='seller')
-    description = models.TextField(max_length=300, blank=True, null=True, verbose_name='contact with store', editable=True)
+    description = models.TextField(max_length=300, blank=True, null=True, verbose_name='description', editable=True)
     location = models.CharField(max_length=50, blank=True, null=True, verbose_name='location', editable=True)
     rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, editable=True, verbose_name='rate')
     
@@ -134,7 +134,7 @@ class Order(models.Model):
     customer = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE, related_name='order', verbose_name='customer')
     total_amount = models.PositiveIntegerField(verbose_name='total amount')
     date = models.DateTimeField(auto_now_add=True, verbose_name='date of the order')
-    status = models.CharField(choices=OrderStatus.choices, default=OrderStatus.PENDING, verbose_name='status')
+    status = models.CharField(choices=OrderStatus.choices, default=OrderStatus.PENDING, verbose_name='status', editable=True)
     
 
     class Meta:
