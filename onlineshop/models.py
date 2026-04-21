@@ -94,6 +94,9 @@ class Store(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name='category name', unique=True)
     slug = models.SlugField(max_length=200, unique=True, verbose_name='slug')
+
+    def __str__(self):
+        return self.name
     
 class Product(models.Model):
     name = models.CharField(max_length=50, unique=True, blank=False, null=False, verbose_name='product')
@@ -104,7 +107,7 @@ class Product(models.Model):
     store = models.ForeignKey(Store, on_delete = models.CASCADE, related_name='product', verbose_name='store')
     created_at = models.DateTimeField(auto_now_add=True)
     rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, verbose_name='rate')
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, verbose_name='category')
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='category')
 
     class Meta:
         verbose_name = 'Product'

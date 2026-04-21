@@ -2,6 +2,18 @@
 {% load static %}
 {% block title %}Home | DijiKala{% endblock %}
 
+{% block categories %}
+<div style="width: 200px; margin-right: 20px;">
+    <h3>Product Categories</h3>
+    <p>===============</p>
+    <ul>
+        {% for cat in categories %}
+            <li><a href="?cat={{ cat.id }}">{{ cat.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
 {% block content %}
 <h2>🛒 Latest Products</h2>
 <a href="{% url 'stores' %}">all stores</a>
@@ -34,5 +46,5 @@
     {% empty %}
         <p>No products yet!</p>
     {% endfor %}
-</div>
+
 {% endblock %}

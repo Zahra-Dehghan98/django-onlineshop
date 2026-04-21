@@ -15,7 +15,7 @@ from django.db import transaction
 class UserRegisterView(CreateView):
     form_class = UserRegisterForm
     template_name = 'signup.html'
-    success_url = reverse_lazy('/')
+    success_url = reverse_lazy('home')
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -66,7 +66,18 @@ class ShowAllProducts(ListView):
     model = Product
     template_name = 'home.html'
     context_object_name = 'products'
-#===================================================================
+
+    def get_queryset(self):
+        queryset = Product.objects.all()
+        cat_id = self.request.GET.get('cat')
+        if cat_id:
+            queryset = queryset.filter(category_id=cat_id)
+    
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(name__icontains=q.lower())
+        return queryset
+#============================================
 class ShowAllStores(ListView):
     model = Store
     template_name = 'stores.html'
@@ -106,9 +117,8 @@ class AddProductView(CreateView):
     model = Product
     form_class = AddProductForm
     template_name = 'create_product.html'
-    success_url = reverse_lazy ('/')
-
-
+    success_url = reverse_lazy ('home')
+    
     def form_valid(self, form):
         obj = form.save(commit=False)
         
