@@ -5,6 +5,8 @@
 {% if user.is_seller == False %}
     <h2>Thank you for your payment</h2><br>
     <p><a href="{% url 'customer_panel' %}" class="btn">Customer Panel</a></p>
+    <br>
+    <p><a href="{% url 'cart' %}" class="btn">Your Cart</a></p>
     <br> 
     <p><a href="{% url 'order_history' %}" class="btn">📜 Order History</a></p>
 {% else %}
