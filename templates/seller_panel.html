@@ -9,6 +9,7 @@
             <p><strong>Last Name:</strong> {{ user.last_name }}</p>
             <p><strong>Phone:</strong> {{ user.phone }}</p>
             <p><strong>Balance:</strong> ${{ user.sellerprof.balance }}</p>
+            
         </div>
         <a href="{% url 'create_store' %}" class="btn">+ Create New Store</a>
 
@@ -18,6 +19,7 @@
                     <h3>{{ store.name }}</h3>
                     <p>{{ store.description|truncatewords:15 }}</p>
                     <a href="{% url 'store_detail' store.id %}" class="btn">Manage Store</a>
+                    <a href="{% url 'edit_store' store.id %}" class="btn">Edit Store Information</a>
                 </div>
             {% empty %}
                 <p>You have no stores yet.</p>

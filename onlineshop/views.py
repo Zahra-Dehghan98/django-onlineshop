@@ -278,6 +278,12 @@ class UpdateProductdetailView(UpdateView):
     success_url = reverse_lazy('seller_panel')
     template_name = 'update_product.html'
 #====================================================
+class UpdateStoreView(UpdateView):
+    model = Store
+    form_class = AddStoreForm
+    success_url = reverse_lazy('seller_panel')
+    template_name = 'update_store.html'
+#====================================================
 
 
 

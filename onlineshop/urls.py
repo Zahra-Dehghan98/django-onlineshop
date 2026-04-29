@@ -19,5 +19,6 @@ urlpatterns = [
     path('checkout/', CheckoutView.as_view(), name='checkout'),
     path('orderhistory/', OrderHistoryView.as_view(), name='order_history'),
     path('thankyou/', ThankYouView, name='thank_you'),
-    path('editproduct/<int:pk>/', UpdateProductdetailView.as_view(), name='edit_product')
+    path('editproduct/<int:pk>/', UpdateProductdetailView.as_view(), name='edit_product'),
+    path('stores/<int:pk>/editstore/', UpdateStoreView.as_view(), name='edit_store')
 ] 
