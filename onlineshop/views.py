@@ -240,6 +240,9 @@ class CheckoutView(View):
         total = 0
         for item in cart_items:
             total += item.product.price * item.quantity
+            if customer.balance < total:
+                messages.info(request, "Your wallet balance is less than the cart total.")
+                return redirect ('payment')
         customer.balance -= total
         customer.save()
         for item in cart_items:
