@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Update Product | DigiKala{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    {% if user.is_seller == True %}
+        <h2>🧾 Update Product</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="form-group">
+                <label for="id_name">Name</label>
+                {{ form.name }}
+            </div><br>
+
+            <div class="form-group">
+                <label for="category">category</label>
+                {{ form.category }}
+            </div><br>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                {{ form.description }}
+            </div><br>
+
+            <div class="form-group">
+                <label for="id_price">price</label>
+                {{ form.price }}
+            </div><br>
+
+            <div class="form-group">
+                <label for="id_image">image</label>
+                {{ form.image }}
+            </div><br>
+
+            <div class="form-group">
+                <label for="id_stock">stock</label>
+                {{ form.stock }}
+            </div><br>
+
+            <button type="submit" class="btn">Save Changes</button>
+        </form>
+    {% else %}
+        <h3> ❌ Access Denied</h3><br>
+        <p>Customers cannot add products. Please register as a seller to create a store</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

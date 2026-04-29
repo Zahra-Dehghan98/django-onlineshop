@@ -5,7 +5,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import CreateView
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, UpdateView
 from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
@@ -271,6 +271,14 @@ class OrderHistoryView(ListView):
 #====================================================
 def ThankYouView(request):
     return render(request, 'thank_you.html')
+#====================================================
+class UpdateProductdetailView(UpdateView):
+    model = Product
+    form_class = AddProductForm
+    success_url = reverse_lazy('seller_panel')
+    template_name = 'update_product.html'
+#====================================================
+
 
 
 

@@ -36,6 +36,8 @@
                     </div>
                     <button type="submit" class="btn btn-success mt-2">َAdd To Cart</button>
                     </form>
+                {% else %}
+                    <p><a href="{% url 'edit_product' product.id %}">Edit Product</a></p>
                 {% endif %}
             {% else %}
                 <p><a href="{% url 'login' %}">Login to Buy</a></p>
