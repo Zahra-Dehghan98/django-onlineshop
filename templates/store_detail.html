@@ -22,7 +22,7 @@
             {% else %}
                 <img src="{% static 'images/default_product.jpg' %}" alt="No image">
             {% endif %}
-            <h3>{{ product.name }}</h3>
+            <a href="{% url 'edit_product' product.id %}" style="text-decoration: none;"><h3>{{ product.name }}</h3></a>
             <p>{{ product.description|truncatewords:12 }}</p>
             <p><strong>${{ product.price }}</strong></p>
 
@@ -37,10 +37,10 @@
                     <button type="submit" class="btn btn-success mt-2">َAdd To Cart</button>
                     </form>
                 {% else %}
-                    <a href="{% url 'edit_product' product.id %}">Edit Product</a>
+                    <a class="btn" href="{% url 'edit_product' product.id %}">Edit Product</a>
                 {% endif %}
             {% else %}
-                <p><a href="{% url 'login' %}">Login to Buy</a></p>
+                <p><a class="btn" href="{% url 'login' %}">Login to Buy</a></p>
             {% endif %}
         </div>
     {% empty %}
