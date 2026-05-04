@@ -2,8 +2,10 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
+"""Custom user manager for User model with phone as username field.Handles creation of regular users and superusers."""
 class CustomUserManager(BaseUserManager):
     def _create_user(self, phone, password=None, **extra_fileds):
+        """Internal method to create a user with phone number and full name validation."""
         first_name = extra_fileds.get('first_name')
         last_name = extra_fileds.get('last_name')
         if not phone:
@@ -16,11 +18,13 @@ class CustomUserManager(BaseUserManager):
         return user
     
     def create_user(self, phone, password=None, **extra_fields):
+        """Create and save a regular user with the given phone and password."""
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', False)
         return self._create_user(phone, password,**extra_fields)
     
     def create_superuser(self, phone, password=None, **extra_fields):
+        """Create and save a superuser with staff and superuser privileges."""
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -34,6 +38,9 @@ class CustomUserManager(BaseUserManager):
         
         return self._create_user(phone, password,**extra_fields)
 
+
+""" Custom User model using phone number as the unique identifier instead of username. 
+Supports seller/customer role separation via is_seller flag."""
 class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=11, unique=True, verbose_name='phone number')
     first_name = models.CharField(max_length=50, verbose_name='first name')
@@ -50,6 +57,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
+
+""" Profile model for customers. One-to-one relationship with User. Stores customer's wallet balance."""
 class CustomerProfile(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='customerprof', verbose_name='customer')
     balance = models.PositiveIntegerField(default=0, verbose_name='balance' ,editable=True)
@@ -61,7 +70,9 @@ class CustomerProfile(models.Model):
 
     def __str__(self):
         return self.user.first_name
-    
+
+
+""" Profile model for sellers. One-to-one relationship with User. Stores seller's earnings balance."""
 class SellerProfile(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='sellerprof', verbose_name='seller')
     balance = models.PositiveIntegerField(default=0, verbose_name='balance' ,editable=True)
@@ -73,8 +84,10 @@ class SellerProfile(models.Model):
 
     def __str__(self):
         return self.user.first_name
-    
 
+
+""" Store model owned by a seller. Each seller can have multiple stores. 
+Contains store details like name, description, location, and average rating."""
 class Store(models.Model):
     name = models.CharField(max_length=50, unique=True, blank=False, null=False, verbose_name='store')
     seller = models.ForeignKey(SellerProfile, on_delete = models.CASCADE, related_name='store', verbose_name='seller')
@@ -82,7 +95,6 @@ class Store(models.Model):
     location = models.CharField(max_length=50, blank=True, null=True, verbose_name='location', editable=True)
     rating = models.DecimalField(max_digits=5, decimal_places =1, blank=True, null=True, verbose_name='rate')
     
-
     class Meta:
         verbose_name = 'Store'
         verbose_name_plural = 'Stores'
@@ -90,14 +102,18 @@ class Store(models.Model):
 
     def __str__(self):
         return self.name
-    
+
+
+"""Product category model for organizing products.Uses slug for SEO-friendly URLs."""
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name='category name', unique=True)
     slug = models.SlugField(max_length=200, unique=True, verbose_name='slug')
 
     def __str__(self):
         return self.name
-    
+
+
+"""Product model belonging to a store and category.Contains product details including pricing, stock, images, and rating."""
 class Product(models.Model):
     name = models.CharField(max_length=50, unique=True, blank=False, null=False, verbose_name='product')
     price = models.PositiveIntegerField(blank=False, null=False, verbose_name='price', editable=True)
@@ -116,7 +132,9 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-    
+
+
+"""Shopping cart item model. Links a product to a customer with quantity.Ensures each customer-product pair is unique."""
 class CartItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='product')
     customer = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE, related_name='cartitem', verbose_name='customer')
@@ -130,6 +148,8 @@ class CartItem(models.Model):
     def __str__(self):
         return f'quantity:{self.quantity} - product: {self.product} in CartItem of {self.customer}'
 
+
+"""Order model representing a purchase transaction.Contains order status tracking and total amount."""
 class Order(models.Model):
     class OrderStatus(models.TextChoices):
         PENDING = 'pending', _('در انتظار')
@@ -143,7 +163,6 @@ class Order(models.Model):
     date = models.DateTimeField(auto_now_add=True, verbose_name='date of the order')
     status = models.CharField(choices=OrderStatus.choices, default=OrderStatus.PENDING, verbose_name='status', editable=True)
     
-
     class Meta:
         verbose_name = 'Order'
         verbose_name_plural = 'Orders'
@@ -152,6 +171,9 @@ class Order(models.Model):
     def __str__(self):
         return f'order: {self.customer} in date:{self.date} - total amount: {self.total_amount} in status:{self.status}'
 
+
+"""Order item model representing individual products within an order.
+Price is frozen at purchase time (editable=False) to preserve order history."""
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='orderitem', verbose_name='order')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, verbose_name='product')

@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import CreateView
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView
 from django.views.generic import ListView, DetailView, UpdateView
 from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,6 +12,10 @@ from django.shortcuts import get_object_or_404
 from django.views import View
 from django.db import transaction
 
+
+# ==================== AUTHENTICATION VIEWS ====================
+"""Handle user registration for both customers and sellers.
+Creates appropriate profile (CustomerProfile or SellerProfile) based on is_seller flag."""
 class UserRegisterView(CreateView):
     form_class = UserRegisterForm
     template_name = 'signup.html'
@@ -20,26 +24,28 @@ class UserRegisterView(CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         user = self.object
-        is_seller = form.cleaned_data.get('is_seller',False)
+        is_seller = form.cleaned_data.get('is_seller', False)
         if is_seller:
-            SellerProfile.objects.create(user = user)
+            SellerProfile.objects.create(user=user)
             messages.success(self.request, f'Seller account created for {user.last_name}')
         else:
             CustomerProfile.objects.create(user=user)
             messages.success(self.request, f'Customer account created for {user.last_name}')
-        login(self.request, user) 
-        return response  
-    
+        login(self.request, user)
+        return response
+
     def form_invalid(self, form):
         messages.error(self.request, 'Registration failed. Please try again')
         return super().form_invalid(form)
-    
+
+
+"""Handle user login and redirect based on user role (seller or customer)."""
 class UserLoginView(LoginView):
     form_class = UserLoginForm
     template_name = 'login.html'
 
     def form_valid(self, form):
-        response = super().form_valid(form)  
+        response = super().form_valid(form)
         user = form.get_user()
         if user.is_seller:
             messages.success(self.request, f'{user.last_name} logged in as seller')
@@ -50,18 +56,22 @@ class UserLoginView(LoginView):
     def get_success_url(self):
         user = self.request.user
         if user.is_seller:
-            return reverse_lazy('seller_panel') 
+            return reverse_lazy('seller_panel')
         else:
-            return reverse_lazy('customer_panel') 
+            return reverse_lazy('customer_panel')
 
     def form_invalid(self, form):
         messages.error(self.request, 'Incorrect phone number or password')
         return super().form_invalid(form)
 
+"""Log out the user and display logged out page."""
 def user_logout_view(request):
     logout(request)
     return render(request, 'logged_out.html')
-#===================================================================
+
+# ==================== PRODUCT AND STORE BROWSING ====================
+"""Display all products with filtering by category and search by name.
+Supports GET parameters: 'cat' for category filter, 'q' for search query."""
 class ShowAllProducts(ListView):
     model = Product
     template_name = 'home.html'
@@ -72,22 +82,31 @@ class ShowAllProducts(ListView):
         cat_id = self.request.GET.get('cat')
         if cat_id:
             queryset = queryset.filter(category_id=cat_id)
-    
+
         q = self.request.GET.get('q')
         if q:
             queryset = queryset.filter(name__icontains=q.lower())
         return queryset
-#============================================
+
+"""Display all stores in the marketplace."""
 class ShowAllStores(ListView):
     model = Store
     template_name = 'stores.html'
     context_object_name = 'stores'
-#===================================================================
+
+"""Display detailed information for a single store and its products."""
 class ShowDetailStore(DetailView):
     model = Store
     template_name = 'store_detail.html'
     context_object_name = 'store'
-#===================================================
+
+"""Display detailed information for a single product."""
+class ShowDetailProduct(DetailView):
+    model = Product
+    template_name = 'product_detail.html'
+
+# ==================== SELLER PANEL ====================
+""" Display seller's dashboard with all stores owned by the logged-in seller. Only accessible to authenticated sellers."""
 class SellerPanelView(LoginRequiredMixin, ListView):
     model = Store
     template_name = 'seller_panel.html'
@@ -99,36 +118,52 @@ class SellerPanelView(LoginRequiredMixin, ListView):
             seller_profile_instance = user.sellerprof
             return Store.objects.filter(seller=seller_profile_instance)
         except SellerProfile.DoesNotExist:
-            return Store.objects.none()       
-#===================================================
+            return Store.objects.none()
+
+"""Allow sellers to create a new store."""
 class AddStoreView(CreateView):
     model = Store
     form_class = AddStoreForm
     template_name = 'create_store.html'
     context_object_name = 'store'
-    success_url = reverse_lazy ('stores')
+    success_url = reverse_lazy('stores')
 
     def form_valid(self, form):
         seller_profile = SellerProfile.objects.get(user=self.request.user)
         form.instance.seller = seller_profile
         return super().form_valid(form)
-#===================================================
+
+"""Allow sellers to edit their existing store information."""
+class UpdateStoreView(UpdateView):
+    model = Store
+    form_class = AddStoreForm
+    success_url = reverse_lazy('seller_panel')
+    template_name = 'update_store.html'
+
+"""Allow sellers to add new products to their store."""
 class AddProductView(CreateView):
     model = Product
     form_class = AddProductForm
     template_name = 'create_product.html'
-    success_url = reverse_lazy ('home')
-    
+    success_url = reverse_lazy('home')
+
     def form_valid(self, form):
         obj = form.save(commit=False)
-        
-        store_id = self.kwargs.get('pk') 
+        store_id = self.kwargs.get('pk')
         store = get_object_or_404(Store, pk=store_id)
-        
         obj.store = store
         obj.save()
         return super().form_valid(form)
-#===================================================
+
+"""Allow sellers to edit their existing products."""
+class UpdateProductdetailView(UpdateView): 
+    model = Product
+    form_class = AddProductForm
+    success_url = reverse_lazy('seller_panel')
+    template_name = 'update_product.html'
+
+# ==================== CUSTOMER PANEL ====================
+"""Display customer dashboard with profile information and balance."""
 class CustomerPanelView(LoginRequiredMixin, DetailView):
     model = CustomerProfile
     template_name = 'customer_panel.html'
@@ -140,15 +175,30 @@ class CustomerPanelView(LoginRequiredMixin, DetailView):
             messages.error(self.request, "")
         else:
             customer = CustomerProfile.objects.get(user=user)
-            return customer  
-#===================================================
+            return customer
+
+"""Handle adding funds to customer's wallet balance."""
+class AddBalanceView(View):
+    def get(self, request):
+        return render(request, 'payment.html')
+
+    def post(self, request):
+        user = self.request.user
+        amount = int(request.POST.get('amount', 0))
+        customer_profile = CustomerProfile.objects.get(user=user)
+        customer_profile.balance += amount
+        customer_profile.save()
+        return redirect('thank_you')
+
+# ==================== SHOPPING CART ====================
+"""Display all items in the customer's shopping cart with total calculation."""
 class AddedItemsListView(ListView):
     model = CartItem
     template_name = 'cart.html'
     context_object_name = 'cart_items'
 
     def get_queryset(self):
-        user = self.request.user 
+        user = self.request.user
         if not user.is_authenticated:
             return CartItem.objects.none()
         try:
@@ -156,7 +206,7 @@ class AddedItemsListView(ListView):
             return CartItem.objects.filter(customer=customer)
         except CustomerProfile.DoesNotExist:
             return CartItem.objects.none()
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         total = 0
@@ -164,7 +214,8 @@ class AddedItemsListView(ListView):
             total += item.product.price * item.quantity
         context['total'] = total
         return context
-#===================================================
+
+"""Handle adding products to shopping cart with stock validation."""
 class AddToCartView(View):
     def post(self, request, store_id, product_id):
         product = get_object_or_404(Product, pk=product_id)
@@ -180,17 +231,17 @@ class AddToCartView(View):
                 raise ValueError("Product quantity must be a positive number")
             if product.stock < quantity:
                 messages.error(request, "Not enough product in stock")
-                return redirect('store_detail', pk=store_id)     
+                return redirect('store_detail', pk=store_id)
         except (ValueError, TypeError):
             messages.error(request, "Quantity value is invalid")
             return redirect('store_detail', pk=store_id)
-        
+
         cart_item, created = CartItem.objects.get_or_create(
             product=product,
             customer=customer,
-            defaults={'quantity': quantity} 
+            defaults={'quantity': quantity}
         )
-        
+
         if not created:
             cart_item.quantity += quantity
             cart_item.save()
@@ -199,42 +250,33 @@ class AddToCartView(View):
 
         product.stock -= quantity
         product.save()
-        
+
         messages.success(request, "Product added to cart successfully")
         return redirect('cart')
-#======================================================
+
+"""Handle removing items from shopping cart and restoring stock."""
 class RemoveFromCartView(View):
     model = CartItem
     template_name = 'cart.html'
-    
+
     def get(self, request, item_id):
-        item = CartItem.objects.get(id = item_id)
+        item = CartItem.objects.get(id=item_id)
         product = item.product
         product.stock += item.quantity
         product.save()
         item.delete()
         item2 = CartItem.objects.all()
-        return render (request, 'cart.html', {'cart_items':item2})
-#======================================================
-class AddBalanceView(View):
-    def get(self, request):
-        return render (request, 'payment.html')
+        return render(request, 'cart.html', {'cart_items': item2})
 
-    def post(self, request):
-        user = self.request.user
-        amount = int(request.POST.get('amount', 0))
-        customer_profile = CustomerProfile.objects.get(user=user)
-        customer_profile.balance += amount
-        customer_profile.save()
-        return redirect('thank_you')
-#=======================================================
+# ==================== CHECKOUT AND ORDERS ====================
+""" Process checkout with balance validation. Checks if customer has sufficient balance before completing order."""
 class CheckoutView(View):
     @transaction.atomic
     def post(self, request):
         user = request.user
-        customer = CustomerProfile.objects.get(user = user)
+        customer = CustomerProfile.objects.get(user=user)
         cart_items = CartItem.objects.filter(customer=customer)
-        if not cart_items.exists(): 
+        if not cart_items.exists():
             messages.error(request, "your cart is empty!")
             return redirect('cart')
         total = 0
@@ -242,7 +284,7 @@ class CheckoutView(View):
             total += item.product.price * item.quantity
             if customer.balance < total:
                 messages.info(request, "Your wallet balance is less than the cart total.")
-                return redirect ('payment')
+                return redirect('payment')
         customer.balance -= total
         customer.save()
         for item in cart_items:
@@ -250,12 +292,13 @@ class CheckoutView(View):
             amount = item.product.price * item.quantity
             seller.balance += amount
             seller.save()
-        order = Order.objects.create(customer=customer, total_amount = total)
+        order = Order.objects.create(customer=customer, total_amount=total)
         for item in cart_items:
-            order_item = OrderItem.objects.create(order= order, product = item.product, quantity = item.quantity, price = item.product.price)
+            order_item = OrderItem.objects.create(order=order, product=item.product, quantity=item.quantity, price=item.product.price)
         cart_items.delete()
-        return redirect ('thank_you')
-#=================================================  
+        return redirect('thank_you')
+
+"""Display order history for the logged-in customer."""
 class OrderHistoryView(ListView):
     model = Order
     context_object_name = 'orders'
@@ -268,44 +311,7 @@ class OrderHistoryView(ListView):
             return Order.objects.filter(customer=customer)
         except CustomerProfile.DoesNotExist:
             return Order.objects.none()
-#====================================================
+
+"""Display thank you page after successful payment and order placement."""
 def ThankYouView(request):
     return render(request, 'thank_you.html')
-#====================================================
-class UpdateProductdetailView(UpdateView):
-    model = Product
-    form_class = AddProductForm
-    success_url = reverse_lazy('seller_panel')
-    template_name = 'update_product.html'
-#====================================================
-class UpdateStoreView(UpdateView):
-    model = Store
-    form_class = AddStoreForm
-    success_url = reverse_lazy('seller_panel')
-    template_name = 'update_store.html'
-#====================================================
-class ShowDetailProduct(DetailView):
-    model = Product
-    template_name = 'product_detail.html'
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-
-
-
-    
-
-        
