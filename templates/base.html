@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}DijiKala{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/style3.css' %}">
+    <title>{% block title %}Kaleido{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
@@ -13,11 +13,11 @@
     <nav class="navbar">
         <div class="container">
             <div class="nav-left">
-                <a class="logo" href="{% url 'home' %}">dijikala</a>
+                <a class="logo" href="{% url 'home' %}">Kaleido</a>
             </div>
 
             <div class="nav-center">
-                <form method="GET" action="">
+                <form method="GET">
                     <input type="text" name="q" placeholder="Search products..." value="{{ request.GET.q }}">
                     <button type="submit">Search</button>
                 </form>
@@ -59,11 +59,11 @@
         {% block content %}
         {% endblock %}
     </main>
-
+     
     <footer class="footer">
-        <p>© 2025 DijiKala – Made with ❤️ for Django students.</p>
+        <p>© 2026 Kaleido – Made with ❤️ for Django students.</p>
     </footer>
-
+    
     {% block scripts %}
     {% endblock %}
 </body>

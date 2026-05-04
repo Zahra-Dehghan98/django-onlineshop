@@ -1,33 +1,48 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}{{ product.name }} | DijiKala{% endblock %}
+{% block title %}{{ product.name }} | Kaleido{% endblock %}
 
 {% block content %}
-<div class="store-header">
-    <h2>{{ product.name }}</h2>
-    <p>{{ product.description }}</p><br>
-    <div class="card">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}">
-            {% else %}
-                <img src="{% static 'images/default_product.jpg' %}" alt="No image">
-            {% endif %}
-            <p><strong>${{ product.price }}</strong></p>
-            {% if user.is_authenticated %}
-                {% if user.is_seller == False %}
-                    <form method="POST" action="{% url 'add_to_cart' store_id=product.store.id product_id=product.id %}">
+<div class="product-detail">
+    <div class="product-detail-image">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        {% else %}
+            <img src="{% static 'images/default_product.jpg' %}" alt="No image">
+        {% endif %}
+    </div>
+    
+    <div class="product-detail-info">
+        <h1>{{ product.name }}</h1>
+        <p class="product-category">Category:  {{ product.category.name }}</p>
+        <p class="product-store">
+            Store: <a href="{% url 'store_detail' product.store.id %}">{{ product.store.name }}</a>
+        </p><br>
+        <p class="product-description">{{ product.description }}</p>
+        <p class="product-price"><strong>${{ product.price }}</strong></p>
+        
+        {% if user.is_authenticated %}
+            {% if user.is_seller == False %}
+                <form style="border: none; margin-bottom: 0;padding-bottom: 0; padding-top: 0;" method="POST" action="{% url 'add_to_cart' store_id=product.store.id product_id=product.id %}" class="add-to-cart-form">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="quantity">Quantity:</label>
-                        <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control">
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control">
                     </div>
-                    <button type="submit" class="btn btn-success mt-2">َAdd To Cart</button>
-                    </form>
-                {% else %}
-                    <a class="btn" href="{% url 'edit_product' product.id %}">Edit Product</a>
-                {% endif %}
+                    <button type="submit" class="btn btn-success">Add To Cart</button>
+                </form>
             {% else %}
-                <p><a class="btn" href="{% url 'login' %}">Login to Buy</a></p>
+                <div class="product-actions">
+                    {% if product.store.seller.user == user %}
+                        <a class="btn" href="{% url 'edit_product' product.id %}">Edit Product</a>
+                    {% else %}
+                        <p style="font-weight: bold; color: red;">You can't edit or delete this product. Only the store owner can.</p>
+                    {% endif %}
+                </div>
             {% endif %}
-        </div>
+        {% else %}
+            <p><a class="btn" href="{% url 'login' %}">Login to Buy</a></p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

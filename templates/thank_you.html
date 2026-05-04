@@ -3,7 +3,8 @@
 
 {% block content %}
 {% if user.is_seller == False %}
-    <h2>Thank you for your payment</h2><br>
+    <h2> ✅ Thank you for your payment!</h2><br>
+    <p>Your payment was successful.</p><br>
     <p><a href="{% url 'customer_panel' %}" class="btn">Customer Panel</a></p>
     <br>
     <p><a href="{% url 'cart' %}" class="btn">Your Cart</a></p>

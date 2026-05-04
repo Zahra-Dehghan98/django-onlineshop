@@ -1,27 +1,37 @@
 {% extends 'base.html' %}
-{% block title %}Customer Panel | DijiKala{% endblock %}
+{% block title %}Customer Panel | Kaleido{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
     {% if user.is_seller == False %}
-        <h2>👤 Customer Panel</h2>
-
-        <div class="card" style="max-width: 400px;">
-            <p><strong>Last Name:</strong> {{ user.last_name }}</p>
-            <p><strong>Phone:</strong> {{ user.phone }}</p>
-            <p><strong>Customer ID:</strong> {{ customer_profile.id }}</p>
-            <p><strong>Balance:</strong> ${{ customer_profile.balance }}</p>
-
-            <div style="margin-top: 10px;">
-                <a href="{% url 'payment' %}" class="btn">💳 Increase Balance</a>
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h2>👤 Customer Dashboard</h2>
+                <p>Welcome back, {{ user.first_name }}!</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Wallet Balance</h3>
+                    <p class="stat-amount">${{ customer_profile.balance }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Customer ID</h3>
+                    <p class="stat-amount">#{{ customer_profile.id }}</p>
+                </div>
+            </div>
+            
+            <div class="dashboard-actions">
+                <a href="{% url 'payment' %}" class="btn btn-primary">💳 Add Balance</a>
                 <a href="{% url 'cart' %}" class="btn">🛒 View Cart</a>
                 <a href="{% url 'order_history' %}" class="btn">📜 Order History</a>
             </div>
         </div>
-
     {% else %}
-        <h3> ❌ Access Denied</h3><br>
-        <p>Sellers are not allowed to access this page</p>
+        <div class="access-denied">
+            <h3>❌ Access Denied</h3>
+            <p>Sellers are not allowed to access this page</p>
+        </div>
     {% endif %}
 {% endif %}
 {% endblock %}

@@ -3,47 +3,53 @@
 {% block title %}Home | DigiKala{% endblock %}
 
 {% block categories %}
-<div class="product-category">
-    <h3>Product Categories</h3>
-    <ul>
+<div class="home-layout">
+    <div class="product-category">
+        <h3>Product Categories</h3>
+        <ul>
         {% for cat in categories %}
             <li><a href="?cat={{ cat.id }}">{{ cat.name }}</a></li>
         {% endfor %}
-    </ul>
-</div>
-{% endblock %}
-
-{% block content %}
-<h2>🛒 Latest Products</h2>
-<a class="btn"  href="{% url 'stores' %}">all stores</a>
-<div class="card-grid">
-    {% for product in products %}
-        <div class="card">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}">
-            {% else %}
-                <img src="{% static 'images/default_product.jpg' %}" alt="No image">
-            {% endif %}
-            <a href="{% url 'edit_product' product.id %}" style="text-decoration: none;"><h3>{{ product.name }}</h3></a>
-            <p>{{ product.description|truncatewords:12 }}</p>
-            <p><strong>${{ product.price }}</strong></p>
-            {% if user.is_authenticated %}
-                {% if user.is_seller == False %}
-                    <form method="POST" action="{% url 'add_to_cart' store_id=product.store.id product_id=product.id %}">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="quantity">Quantity:</label>
-                        <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control">
-                    </div>
-                    <button type="submit" class="btn btn-success mt-2">َAdd To Cart</button>
-                    </form>
-                {% endif %}
-            {% else %}
-                <p><a class="btn" href="{% url 'login' %}">Login to Buy</a></p>
-            {% endif %}
+        </ul>
+    </div>
+    
+    <div class="products-section">
+        <h2>🛒 Latest Products</h2>
+        <a class="btn" href="{% url 'stores' %}">all stores</a>
+        <div class="card-grid">
+            {% for product in products %}
+                <div class="card">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                        <img src="{% static 'images/default_product.jpg' %}" alt="No image">
+                    {% endif %}
+                    <a href="{% url 'product_detail' product.id %}" style="text-decoration: none;"><h3>{{ product.name }}</h3></a>
+                    <p>{{ product.description|truncatewords:10 }}</p>
+                    <p><strong>${{ product.price }}</strong></p>
+                    {% if user.is_authenticated %}
+                        {% if user.is_seller == False %}
+                            <form style="margin-bottom: 0; margin-top: 0; border: none;" method="POST" action="{% url 'add_to_cart' store_id=product.store.id product_id=product.id %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="quantity">Quantity:</label>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control">
+                            </div>
+                            <button type="submit" class="btn btn-success mt-2" style="margin-bottom: 0; margin-top: 0;">َAdd To Cart</button>
+                            </form>
+                        {% else %}
+                            {% if product.store.seller.user == user %}
+                                <a class="btn" href="{% url 'edit_product' product.id %}">Edit Product</a>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <p><a class="btn" href="{% url 'login' %}">Login to Buy</a></p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>No products yet!</p>
+            {% endfor %}
         </div>
-    {% empty %}
-        <p>No products yet!</p>
-    {% endfor %}
-
+    </div>
+</div>
 {% endblock %}

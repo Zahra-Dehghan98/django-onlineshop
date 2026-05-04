@@ -1,33 +1,56 @@
 {% extends 'base.html' %}
-{% block title %}Seller Panel | DijiKala{% endblock %}
+{% block title %}Seller Panel | Kaleido{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
     {% if user.is_seller == True %}
-        <h2>👨‍💼 Seller Panel</h2>
-        <div class="card" style="max-width: 400px;">
-            <p><strong>Last Name:</strong> {{ user.last_name }}</p>
-            <p><strong>Phone:</strong> {{ user.phone }}</p>
-            <p><strong>Balance:</strong> ${{ user.sellerprof.balance }}</p>
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h2>👨‍💼 Seller Dashboard</h2>
+                <p>Welcome back, {{ user.first_name }}!</p>
+            </div>
             
-        </div>
-        <a href="{% url 'create_store' %}" class="btn">+ Create New Store</a>
-
-        <div class="card-grid" style="margin-top: 20px;">
-            {% for store in stores %}
-                <div class="card">
-                    <h3>{{ store.name }}</h3>
-                    <p>{{ store.description|truncatewords:15 }}</p>
-                    <a href="{% url 'store_detail' store.id %}" class="btn">Manage Store</a>
-                    <a href="{% url 'edit_store' store.id %}" class="btn">Edit Store Information</a>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Store Balance</h3>
+                    <p class="stat-amount">${{ user.sellerprof.balance }}</p>
                 </div>
-            {% empty %}
-                <p>You have no stores yet.</p>
-            {% endfor %}
+                <div class="stat-card">
+                    <h3>Total Stores</h3>
+                    <p class="stat-amount">{{ stores|length }}</p>
+                </div>
+            </div>
+            
+            <div class="dashboard-actions">
+                <a href="{% url 'create_store' %}" class="btn btn-primary">+ Create New Store</a>
+            </div>
+            
+            <div class="dashboard-section">
+                <h3>Your Stores</h3>
+                <div class="store-grid">
+                    {% for store in stores %}
+                        <div class="store-card">
+                            <h4>{{ store.name }}</h4>
+                            <p>{{ store.description|truncatewords:12 }}</p>
+                            <div class="store-actions">
+                                <a href="{% url 'store_detail' store.id %}" class="btn btn-sm">Manage Store</a>
+                                <a href="{% url 'edit_store' store.id %}" class="btn btn-sm btn-outline">Edit Store</a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="empty-state">
+                            <p>You haven't created any stores yet.</p>
+                            <a href="{% url 'create_store' %}" class="btn">Create Your First Store</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     {% else %}
-        <h3> ❌ Access Denied</h3><br>
-        <p>Customers are not allowed to access this page</p>
+        <div class="access-denied">
+            <h3>❌ Access Denied</h3>
+            <p>Customers are not allowed to access this page</p>
+        </div>
     {% endif %}
 {% endif %}
 {% endblock %}

@@ -22,7 +22,7 @@
             {% else %}
                 <img src="{% static 'images/default_product.jpg' %}" alt="No image">
             {% endif %}
-            <a href="{% url 'edit_product' product.id %}" style="text-decoration: none;"><h3>{{ product.name }}</h3></a>
+            <a href="{% url 'product_detail' product.id %}" style="text-decoration: none;"><h3>{{ product.name }}</h3></a>
             <p>{{ product.description|truncatewords:12 }}</p>
             <p><strong>${{ product.price }}</strong></p>
 
@@ -37,7 +37,9 @@
                     <button type="submit" class="btn btn-success mt-2">َAdd To Cart</button>
                     </form>
                 {% else %}
-                    <a class="btn" href="{% url 'edit_product' product.id %}">Edit Product</a>
+                    {% if product.store.seller.user == user %}
+                        <a class="btn" href="{% url 'edit_product' product.id %}">Edit Product</a>
+                    {% endif %}
                 {% endif %}
             {% else %}
                 <p><a class="btn" href="{% url 'login' %}">Login to Buy</a></p>
