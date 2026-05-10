@@ -34,8 +34,8 @@ An e-commerce platform built with Django featuring customer and seller roles.
 
 ## 🚀 Quick Installation
 ```bash```
-git clone https://github.com/yourusername/kaleido.git
-cd kaleido
+git clone git clone https://github.com/Zahra-Dehghan98/django-onlineshop.git
+cd (project directory)
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
