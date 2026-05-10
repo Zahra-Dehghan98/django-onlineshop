@@ -33,38 +33,66 @@ An e-commerce platform built with Django featuring customer and seller roles.
 ---
 
 ## 🚀 Quick Installation
+
 ```bash```
+
 git clone git clone https://github.com/Zahra-Dehghan98/django-onlineshop.git
+
 cd (project directory)
+
 python -m venv venv
+
 source venv/bin/activate  # Windows: venv\Scripts\activate
+
 pip install -r requirements.txt
+
 python manage.py migrate --settings=config.settings.dev
+
 python manage.py createsuperuser --settings=config.settings.dev
+
 python manage.py runserver --settings=config.settings.dev
+
 
 ---
 
 📍 **URLs**
 
 /onlineshop/              → Home page
+
 /onlineshop/signup/       → User registration
+
 /onlineshop/login/        → User login
+
 /onlineshop/logout/       → User logout
+
 /onlineshop/stores/       → List all stores
+
 /onlineshop/stores/<id>/  → Store details
+
 /onlineshop/cart/         → Shopping cart
+
 /onlineshop/checkout/     → Checkout
+
 /onlineshop/orderhistory/ → Order history
+
 /onlineshop/payment/      → Add wallet balance
+
 /onlineshop/thankyou/     → Thank you page
+
 /onlineshop/seller/       → Seller panel
+
 /onlineshop/customer/     → Customer panel
+
 /onlineshop/seller/createstore/ → Create store
+
 /onlineshop/stores/<id>/addproduct/ → Add product
+
 /onlineshop/editproduct/<id>/ → Edit product
+
 /onlineshop/stores/<id>/editstore/ → Edit store
+
 /onlineshop/product/<id>/ → Product details
+
 /admin/                   → Admin panel
 
 ---
